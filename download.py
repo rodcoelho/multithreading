@@ -17,13 +17,22 @@ client = ImgurClient(client_id, client_secret)
 
 def get_links():
     items = client.gallery(section='top', sort='time', page=3, window='week', show_viral=False)
-    return [[x.title, x.link] for x in items]
+    return [x.link for x in items]
 
 
 def download_link(directory,link):
-    logger.info('Downloading')
+    logger.info('Downloading {}'.format(link))
+    download_path = directory / os.path.basename(link)
+    with requests.get(link) as image, download_path.open('wb') as f:
+        f.write(image.readall())
 
 
 def setup_download_dir():
-    pass
+    # create a download destination directory if it doesn’t already exist
+    download_dir = Path('images')
+    if not download_dir.exists():
+        download_dir.mkdir()
+    return download_dir
+
+
 
