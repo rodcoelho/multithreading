@@ -1,6 +1,6 @@
 # Multithreading
 
-Tests the speed of each: Single Threading vs Concurrent Threading vs Parallel Threading 
+Tests the speed of each: Single Threading vs Concurrent Parallel Threading 
 
 ##### Step 1: Clone Repository
 
