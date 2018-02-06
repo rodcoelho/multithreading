@@ -1,5 +1,6 @@
+#!/usr/bin/env python3
+
 import logging
-import os
 from time import time
 
 from download import setup_download_dir, get_links, download_link
@@ -10,9 +11,6 @@ logger = logging.getLogger(__name__)
 
 def main():
     ts = time()
-    # client_id = os.getenv('IMGUR_CLIENT_ID')
-    # if not client_id:
-    #     raise Exception("Could not get IMGUR_CLIENT_ID environment variable")
     download_dir = setup_download_dir()
     links = [l for l in get_links() if l.endswith('.jpg')]
     for link in links:
@@ -21,4 +19,5 @@ def main():
 
 
 if __name__ == '__main__':
+    print("Testing Single Threading")
     main()

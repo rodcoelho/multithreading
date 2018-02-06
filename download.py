@@ -1,6 +1,8 @@
-#!usr/bin/env python3
+#!/usr/bin/env python3
 
 import os, requests, json, logging
+
+from urllib.request import urlopen, Request
 
 from pathlib import Path
 
@@ -21,10 +23,14 @@ def get_links():
 
 
 def download_link(directory,link):
-    logger.info('Downloading {}'.format(link))
+    logger.info('Downloading %s', link)
     download_path = directory / os.path.basename(link)
-    with requests.get(link) as image, download_path.open('wb') as f:
-        f.write(image.readall())
+    with download_path.open('wb') as f:
+        with requests.get(link) as image:
+            f.write(image.readall())
+    # with download_path.open('wb') as f:
+    #     with urlopen(link) as image:
+    #         f.write(image.readall())
 
 
 def setup_download_dir():
