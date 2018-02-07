@@ -3,7 +3,7 @@
 import logging
 from time import time
 
-from download import setup_download_dir, get_links, download_link
+from work import setup_download_dir
 
 logging.basicConfig(level=logging.DEBUG,format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logging.getLogger('requests').setLevel(logging.CRITICAL)
@@ -16,12 +16,11 @@ def main():
     download_dir = setup_download_dir()
 
     # list of work to do
-    links = [l for l in get_links() if l.endswith('.jpg')]
+    list_of_csv =
 
     # iterate over list
     # ACTUAL WORK
-    for link in links:
-        download_link(download_dir, link)
+
 
     # prints time it took to do work
     print("Took {}s".format(time()-ts))
