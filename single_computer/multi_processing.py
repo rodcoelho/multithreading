@@ -19,12 +19,13 @@ def main():
     # set up directory if DNE
     download_dir = setup_download_dir()
 
-    # get links for images
+    # get links for work
     files = aggregate_files_to_do_work_on()
 
+    # work prep
     work = partial(edb_work)                # download = partial(download_link, download_dir)
 
-    # will spawn 4 new processes(pools)
+    # work - will spawn 4 new processes(pools)
     with Pool(4) as p:                      # with Pool(8) as p:
         # do work in parallel               # download the images in parallel
         p.map(work, files)                  # p.map(download, links)

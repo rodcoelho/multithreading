@@ -4,7 +4,7 @@ from queue import Queue
 from threading import Thread
 import logging, os
 from time import time
-from download import download_link, get_links, setup_download_dir
+from work import setup_download_dir, aggregate_files_to_do_work_on, edb_work
 
 logging.basicConfig(level=logging.DEBUG,format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logging.getLogger('requests').setLevel(logging.CRITICAL)
@@ -19,8 +19,8 @@ class DownloadWorker(Thread):
     def run(self):
         while True:
             # get work from queue and expand the tuple
-            directory, link = self.queue.get()
-            download_link(directory, link)
+            file = self.queue.get()
+            edb_work(file)
             self.queue.task_done()
 
 
@@ -30,7 +30,8 @@ def main():
     # prep directory to store output
     download_dir = setup_download_dir()
 
-    links = [l for l in get_links() if l.endswith('.jpg')]
+    # get links for work
+    files = aggregate_files_to_do_work_on()
 
     # Create a queue to communicate with the worker threads
     queue = Queue()
@@ -43,9 +44,9 @@ def main():
         worker.start()
 
     # Put the tasks into the queue as a tuple
-    for link in links:
-        logger.info('Queueing {}'.format(link))
-        queue.put((download_dir, link))
+    for file in files:
+        logger.info('Queueing {}'.format(file))
+        queue.put(file)
 
     # Causes the main thread to wait for the queue to finish processing all the tasks
     queue.join()
