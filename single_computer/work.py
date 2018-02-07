@@ -21,6 +21,28 @@ def aggregate_files_to_do_work_on():
     files = os.listdir("files")
     return files
 
+
+def write_out_to_log(returns):
+    with open('log/results.txt', 'w') as f:
+        json.dump(returns, f, ensure_ascii=False)
+
+
+def read_json_file():
+    try:
+        with open('log/results.txt') as json_data:
+            d = json.load(json_data)
+            return d
+    except:
+        return {}
+
+
+def delete_old_json():
+    try:
+        os.remove('log/results.txt')
+        print("Removed old Json file to store new Json")
+    except:
+        pass
+
 def edb_work(file):
     file = 'files/' + file
     strats = {'5.10': [0, 5, 10], '5.20': [0, 5, 20], '5.30': [0, 5, 30],
@@ -36,9 +58,6 @@ def edb_work(file):
         data['MA-B'] = data['price'].rolling(value[2]).mean()  # MA2
         data['ratio'] = data['MA-A'] / data['MA-B']  # MA1 / MA2 Ratio
         data = data.dropna()  # Drop Non-Real Numbers
-        num_of_rows = (data.shape)[0]  # Number of rows (to iterate over later)
-        dbuy = data[data.ratio > 1.01]  # if ratio > 1, it's a buy signal
-        dsell = data[data.ratio < 0.99]  # if ratio < 1, it's a sell signal
 
         last_transaction = 'SELL'  # keeps track of last transaction
         for i, (index, row) in enumerate(data.iterrows()):
@@ -71,8 +90,10 @@ def edb_work(file):
                 portfolio['cash'] = float(current_cash)
                 portfolio['wilshire']['shares'] = 0
                 strats[key][0] = (portfolio['cash'] - 1000000.0) / 1000000.0
-    strategy_returns_sort = []
+    json_output = read_json_file()
     result = {}
     for keys, values in strats.items():
         result[keys] = values[0]*100
-    return result
+    json_output[file[6:]] = result
+    delete_old_json()
+    write_out_to_log(json_output)

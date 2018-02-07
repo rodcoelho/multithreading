@@ -2,13 +2,16 @@
 
 import logging, os
 from time import time
-from download import download_link, get_links, setup_download_dir
+from work import setup_download_dir, aggregate_files_to_do_work_on, edb_work
 from functools import partial
 from multiprocessing.pool import Pool
 
 logging.basicConfig(level=logging.DEBUG,format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logging.getLogger('requests').setLevel(logging.CRITICAL)
 logger = logging.getLogger(__name__)
+
+d = {}
+
 
 def main():
     ts = time()
@@ -17,13 +20,14 @@ def main():
     download_dir = setup_download_dir()
 
     # get links for images
-    links = [l for l in get_links() if l.endswith('.jpg')]
-    download = partial(download_link, download_dir)
+    files = aggregate_files_to_do_work_on()
 
-    # will spawn 8 new processes(pools)
-    with Pool(8) as p:
-        # download the images in parallel
-        p.map(download, links)
+    work = partial(edb_work)                # download = partial(download_link, download_dir)
+
+    # will spawn 4 new processes(pools)
+    with Pool(4) as p:                      # with Pool(8) as p:
+        # do work in parallel               # download the images in parallel
+        p.map(work, files)                  # p.map(download, links)
 
     print('Took {}s'.format(time() - ts))
 
