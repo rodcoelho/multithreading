@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-from queue import Queue
+from redis import Redis
+from rq import Queue
 from threading import Thread
 import logging
 from time import time
@@ -34,22 +35,12 @@ def main():
     files = aggregate_files_to_do_work_on()
 
     # Create a queue to communicate with the worker threads
-    queue = Queue()
-
-    # Create 8 worker threads
-    for x in range(8):
-        worker = DownloadWorker(queue)
-        # Setting daemon to True will let the main thread exit even though the workers are blocking
-        worker.daemon = True
-        worker.start()
+    q = Queue(connection=Redis(host='localhost', port=6379))
 
     # Put the tasks into the queue as a tuple
     for file in files:
         logger.info('Queueing {}'.format(file))
-        queue.put(file)
-
-    # Causes the main thread to wait for the queue to finish processing all the tasks
-    queue.join()
+        q.enqueue(edb_work, file)
 
     print('Took {}'.format(time() - ts))
 
